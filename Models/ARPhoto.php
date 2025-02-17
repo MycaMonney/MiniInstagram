@@ -80,9 +80,26 @@ class ARPhoto extends BaseModel implements IActiveRecord
 
     public static function findAllByUserId($userId)
     {
-        $sql = "SELECT * FROM " . static::$table . " WHERE user_id = :user_id;";
+        $sql = "
+            SELECT p.* 
+            FROM " . static::$table . " p
+            WHERE p.user_id = :user_id  -- Récupère les photos de l'utilisateur
+            OR p.user_id IN (  
+                -- Récupère les photos des amis de l'utilisateur
+                SELECT CASE 
+                    WHEN f.user_id_1 = :user_id THEN f.user_id_2 
+                    ELSE f.user_id_1 
+                END 
+                FROM Friendship f
+                WHERE f.user_id_1 = :user_id OR f.user_id_2 = :user_id
+            )
+            ORDER BY p.created_at DESC;  -- Trie les photos par date de création (les plus récentes en premier)
+        ";
+
         $stmt = PDOSingleton::getInstance()->getConnection()->prepare($sql);
+
         $stmt->execute(['user_id' => $userId]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
