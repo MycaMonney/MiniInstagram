@@ -7,7 +7,7 @@ use PDO;
 use Exception;
 
 //A réparer
-class ARFriendship extends BaseModel implements IActiveRecord
+class ARFriendship extends BaseModel
 {
     public $userId1;
     public $userId2;
