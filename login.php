@@ -1,8 +1,29 @@
 <?php
 // Importer PDOSingleton
-require_once 'PDOSingleton.php';
-use Config\PDOSingleton;
+use Models\ARUser;
+?>
+<!DOCTYPE html>
+<html lang="fr">
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/Css/style.css">
+    <title>Connexion</title>
+</head>
+
+<body>
+    <h1>Connexion</h1>
+    <form action="login.php" method="post">
+        <label for="username">Pseudo :</label>
+        <input type="text" id="username" name="username" required>
+        <button type="submit">Connexion</button>
+    </form>
+
+</body>
+
+</html>
+<?php
 try {
     // Récupérer l'instance unique de PDO
     $pdo = PDOSingleton::getInstance()->getConnection();
