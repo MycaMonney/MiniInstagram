@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(Admin) Gestion des utilisateurs</title>
+    <link rel="stylesheet" href="../Css/style.css">
+</head>
+
+<body>
+    <h2>Gestion des utilisateurs (Admin)</h2>
+
+    <!-- Message de chargement -->
+    <p id="loadingMessage">Chargement des utilisateurs...</p>
+
+    <!-- Liste des utilisateurs -->
+    <div id="listUsers"></div>
+
+    <!-- Script -->
+    <script src="../js/script.js"></script>
+    <script>
+        // Appelle getUsers en mode admin au chargement de la page
+        document.addEventListener("DOMContentLoaded", function () {
+            getUsers(true);
+        });
+    </script>
+</body>
+
+</html>

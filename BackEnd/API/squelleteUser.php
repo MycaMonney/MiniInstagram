@@ -29,17 +29,42 @@ switch ($typeRequete) {
         break;
 
     case 'POST':
+        $pdo = connexionBdd();
         $user = recupererDonneesJson();
-        $user = filtrerUser($user);
-        $verifUser = verifierUser($user);
 
-        if (is_array($verifUser)) {
-            envoyerDonnees($verifUser, STATUS_HTTP_NON_AUTORISE);
+        // 🔐 Vérification de la connexion utilisateur
+        if (isset($user['action']) && $user['action'] === "login") {
+            $stmt = $pdo->prepare("SELECT * FROM Users WHERE username = :username");
+            $stmt->execute([':username' => $user['username']]);
+            $foundUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($foundUser) {
+                envoyerDonnees(['success' => true, 'message' => 'Connexion réussie'], STATUS_HTTP_OK);
+            } else {
+                envoyerDonnees(['error' => 'Utilisateur non trouvé'], STATUS_HTTP_NON_TROUVE);
+            }
+            exit;
         }
 
-        InsererUser($user['username'], $user['urlPdP']);
-        envoyerDonnees($user, STATUS_HTTP_OK);
-        break;
+        // 🆕 🔹 NOUVEAU : Vérification et insertion d'un nouvel utilisateur
+        if (!isset($user["username"]) || !isset($user["urlPdP"])) {
+            envoyerDonnees(['Erreur' => 'Données incomplètes'], STATUS_HTTP_MAUVAISE_REQUETE);
+        }
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO Users (username, urlPdP) VALUES (:username, :urlPdP)");
+            $stmt->execute([
+                ':username' => $user['username'],
+                ':urlPdP' => $user['urlPdP'],
+            ]);
+
+            $userId = $pdo->lastInsertId();
+            envoyerDonnees(["success" => true, "message" => "Utilisateur ajouté avec succès", "idUser" => $userId], STATUS_HTTP_OK);
+        } catch (PDOException $e) {
+            envoyerDonnees(["Erreur" => "Problème lors de l'ajout en BDD", "details" => $e->getMessage()], STATUS_HTTP_ERREUR_SERVEUR);
+        }
+
+        exit;
 
     case 'PUT':
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -65,19 +90,21 @@ switch ($typeRequete) {
         break;
 
     case 'DELETE':
-        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+        // ✅ Récupération de l'ID utilisateur depuis l'URL
+        $id = filter_input(INPUT_GET, 'idUser', FILTER_VALIDATE_INT);
 
-        if ($id === null || $id === false) {
-            envoyerDonnees(['Erreur' => 'ID non trouvé'], STATUS_HTTP_NON_TROUVE);
+        if (!$id) {
+            envoyerDonnees(['error' => 'ID utilisateur invalide ou manquant'], STATUS_HTTP_NON_TROUVE);
         }
 
         $user = RecupererDonneesUserParID($id);
-        if ($user === false) {
-            envoyerDonnees(['Erreur' => 'User non trouvé'], STATUS_HTTP_NON_TROUVE);
+        if (!$user) {
+            envoyerDonnees(['error' => 'Utilisateur non trouvé'], STATUS_HTTP_NON_TROUVE);
         }
 
+        // 🔥 Suppression de l'utilisateur
         SupprimerUser($id);
-        envoyerDonnees(['message' => "Suppression effectuée."], STATUS_HTTP_OK);
+        envoyerDonnees(['message' => "✅ Utilisateur supprimé avec succès"], STATUS_HTTP_OK);
         break;
 
     default:
