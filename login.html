@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Css/style.css">
+    <title>Connexion</title>
+</head>
+
+<body>
+    <h1>Connexion</h1>
+    <form action="BackEnd/API/squelleteUser.php" method="post">
+        <label for="username">Pseudo :</label>
+        <input type="text" id="username" name="username" required>
+        <br>
+        <input type="hidden" id="urlPdP" name="urlPdP">
+        <br>
+        <p>Pas de compte ? <a href="signup.html">Créer un compte</a></p>
+        <button type="submit">Connexion</button>
+    </form>
+    
+    <script src="js/api.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let nbrPics = Math.floor(Math.random() * 99);
+            let sexe = Math.floor(Math.random() * 2);
+            let url = sexe === 1 
+                ? `https://randomuser.me/api/portraits/women/${nbrPics}.jpg` 
+                : `https://randomuser.me/api/portraits/men/${nbrPics}.jpg`;
+
+            document.getElementById("urlPdP").value = url;
+        });
+    </script>
+
+</body>
+
+</html>
