@@ -10,7 +10,7 @@
 
 <body>
     <h1>Connexion</h1>
-    <form action="BackEnd/API/squelleteUser.php" method="post">
+    <form action="http://localhost/GitHub/MiniInstagram/BackEnd/API/squelleteUser.php" method="post">
         <label for="username">Pseudo :</label>
         <input type="text" id="username" name="username" required>
         <br>
@@ -30,6 +30,7 @@
                 : `https://randomuser.me/api/portraits/men/${nbrPics}.jpg`;
 
             document.getElementById("urlPdP").value = url;
+            console.log("URL de la photo de profil :", url);
         });
     </script>
 

@@ -217,7 +217,7 @@ function InsererPhoto(int $idUser, string $photo_url): int
     $stmt = $pdo->prepare($sql);
     $stmt->bindParam(':user_id', $idUser, PDO::PARAM_INT);
     $stmt->bindParam(':photo_url', $photo_url, PDO::PARAM_STR);
-    
+
     $stmt->execute();
 
     // Retourne l'ID de la photo insérée
@@ -331,17 +331,29 @@ function RecupererDonneesFriendships(): array
  * @param int $idUser
  * @return array Un tableau de relations d'amitié
  */
-function RecupererFriendshipsParIDUser(int $idUser): array
+function RecupererInfosAmisParIDUser(int $idUser): array
 {
     $pdo = connexionBdd();
 
-    $sql = "SELECT * FROM Friendship WHERE user_id_1 = :idUser OR user_id_2 = :idUser";
+    $sql = "
+        SELECT U.idUser, U.username, U.urlPdP
+        FROM Friendship F
+        JOIN Users U ON (
+            (F.user_id_1 = U.idUser AND F.user_id_2 = :idUser1)
+            OR
+            (F.user_id_2 = U.idUser AND F.user_id_1 = :idUser2)
+        )
+    ";
 
-    $statement = $pdo->prepare($sql);
-    $statement->execute([':idUser' => $idUser]);
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([
+        ':idUser1' => $idUser,
+        ':idUser2' => $idUser
+    ]);
 
-    return $statement->fetchAll();
+    return $stmt->fetchAll();
 }
+
 
 /**
  * Crée une nouvelle relation d'amitié en respectant l'ordre des IDs.

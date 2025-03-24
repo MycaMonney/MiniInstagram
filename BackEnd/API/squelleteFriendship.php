@@ -29,7 +29,7 @@ switch ($typeRequete) {
 
         // If there is an id, retrieve friendships for that user
         if ($id !== null) {
-            $friendships = RecupererFriendshipsParIDUser($id);
+            $friendships = RecupererInfosAmisParIDUser($id);
             if ($friendships === false) {
                 envoyerDonnees(['Erreur' => 'Aucune amitié trouvée pour cet utilisateur'], STATUS_HTTP_NON_TROUVE);
             }
