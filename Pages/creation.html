@@ -17,9 +17,10 @@
                     <div>
                         <a class="nav-link d-inline" href="../index.html">Home</a>
                         <a class="nav-link d-inline" href="amis.html">Friends</a>
-                        <a class="nav-link d-inline" href="ajouterAmis.html">Add Friends</a>
+                        <a class="nav-link d-inline" href="ajouterAmis.html">Add_Friends</a>
                         <a class="nav-link d-inline" href="admin.html">Admin</a>
-                        <a class="nav-link d-inline" href="#">Add Post</a>
+                        <a class="nav-link d-inline" href="addPost.html">Add Post</a>
+                        <a class="nav-link d-inline" href="camera.html">Add Post Caméra</a>
                     </div>
                     <div>
                         <a class="nav-link d-inline" href="connexion.html">Login</a>
@@ -39,19 +40,22 @@
         </div>
     </header>
 
-    <main>
+    <main> 
         <div id="formCreation">
             <form id="formulaire" method="post">
                 <label for="username">Nom d'utilisateur :</label>
                 <input type="text" id="username" name="username" required><br>
-
+    
+                <label for="mdp">Mot de passe :</label>
+                <input type="password" id="mdp" name="mdp" required><br>
+    
                 <input type="hidden" id="urlPdP" name="urlPdP"><br>
-
+    
                 <button class="submit" type="submit">Enregistrer</button>
             </form>
         </div>
     </main>
-
+    
     <script src="../js/users.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -1,0 +1,16 @@
+{
+    "name": "daniel-mrmnt/mini-instagram",
+    "autoload": {
+        "psr-4": {
+            "DanielMrmnt\\MiniInstagram\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Miramontes Porto"
+        }
+    ],
+    "require": {
+        "firebase/php-jwt": "^6.11"
+    }
+}

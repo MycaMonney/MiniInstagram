@@ -1,6 +1,13 @@
 <?php
 require_once '../PHP/connexionBase.php';
 
+require_once '../../vendor/autoload.php';
+
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+
+define("SECRET_KEY", "JWT_FDP_DE_MOT_DE_PASSE");
+
 /* ------------------------------ USERS ------------------------------*/
 /**
  * Retourne tous les users
@@ -42,18 +49,39 @@ function RecupererDonneesUserParID(int $idUser): array|false
 }
 
 /**
- * Insert les donées dans la base
- * @return int L'id du User ajouté
+ * Retourne le user en fonction du nom demandé
+ * @return false Le user n'existe pas
+ * @return array Un tableau de user
  */
-function InsererUser(string $username, string $urlPdP): int
+function RecupererDonneesUserParNom(string $nomUser): array|false
 {
     $pdo = connexionBdd();
 
-    $sql = 'INSERT INTO Users (username, urlPdP) VALUES (:USER_NAME, :URL_PDP)';
+    $sql = "SELECT * FROM Users WHERE username = :USER_NAME";
+
+    $statement = $pdo->prepare($sql);
+
+    $statement->execute([
+        ':USER_NAME' => $nomUser
+    ]);
+
+    return $statement->fetch();
+}
+
+/**
+ * Insert les donées dans la base
+ * @return int L'id du User ajouté
+ */
+function InsererUser(string $username, string $mdp, string $urlPdP): int
+{
+    $pdo = connexionBdd();
+
+    $sql = 'INSERT INTO Users (username, mdp, urlPdP) VALUES (:USER_NAME, :MDP, :URL_PDP)';
     $statement = $pdo->prepare($sql);
     $statement->execute([
         ':USER_NAME' => $username,
-        ':URL_PDP' => $urlPdP,
+        ':MDP' => $mdp,
+        ':URL_PDP' => $urlPdP
     ]);
 
     return (int) $pdo->lastInsertId();
@@ -150,15 +178,13 @@ function verifierUser(array $users): array|bool
 function RecupererDonneesPhotos(): array
 {
     $pdo = connexionBdd();
-
     $sql = "SELECT * FROM Photo";
-
     $statement = $pdo->prepare($sql);
-
     $statement->execute();
-
-    return $statement->fetchAll();
+    $photos = $statement->fetchAll();
+    return $photos;
 }
+
 
 /**
  * Retourne la photo en fonction de l'id de la photo demandé
@@ -454,4 +480,40 @@ function recupererDonneesJson(): array
         return [];
     }
     return $donnees;
+}
+
+/* ------------------------------ JWT ------------------------------*/
+/**
+ * Géneration d'un JWT pour un utilisateur
+ * 
+ * @param int $id ID de l'utilisateur
+ * @param string $username Nom d'utilisateur
+ * @return string JWT généré */
+function GenererJWT($id, $username) : string
+{
+    $payload = [
+        'iat' => time(),
+        'exp' => time() + (365 * 24 * 60 * 60),    // expiration (1 an)
+        'id' => $id,
+        'username' => $username
+    ];
+
+    return JWT::encode($payload, SECRET_KEY, 'HS256');
+}
+
+/**
+ * Décodage d'un token JWT pour un utilisatur
+ * @param string $token token de l'utilisateur
+ * @return array Si le token est valide
+ * @return null Si le token est invalide
+*/
+function DecoderJWT(string $token): array|null
+{
+    try {
+        $decoded = JWT::decode($token, new Key(SECRET_KEY, 'HS256'));
+        return (array) $decoded;
+    } catch (Exception $e) {
+        error_log("Token invalide : " . $e->getMessage());
+        return null;
+    }
 }

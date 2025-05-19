@@ -38,14 +38,23 @@ switch ($typeRequete) {
         break;
 
     case 'POST':
-        // Récupérer données json, les filtrer et vérifier qu'elles sont valides
         $friendship = recupererDonneesJson();
 
-        // Utiliser les données pour appeler la fonction Ajouter ou effectuer d'autres opérations
-        InsererFriendship($friendship['user_id_1'], $friendship['user_id_2']);
-        
-        // Répondre avec un code 200 et les données traitées
-        envoyerDonnees($friendship, STATUS_HTTP_OK);
+        // Décodage du token pour obtenir l'utilisateur actuel
+        $user = DecoderJWT($friendship['actual_user_token']);
+
+        if (!$user || !isset($user['id'])) {
+            envoyerDonnees(["success" => false, "message" => "Token invalide."], STATUS_HTTP_NON_AUTORISE);
+            exit;
+        }
+
+        // Ajouter user_id_1 depuis le token
+        $user_id_1 = $user['id'];
+        $user_id_2 = $friendship['user_id_2'];
+
+        InsererFriendship($user_id_1, $user_id_2);
+
+        envoyerDonnees(["success" => true, "message" => "Amitié ajoutée."], STATUS_HTTP_OK);
         break;
 
     case 'DELETE':

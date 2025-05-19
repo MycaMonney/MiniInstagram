@@ -32,36 +32,45 @@ switch ($typeRequete) {
         $pdo = connexionBdd();
         $user = recupererDonneesJson();
 
-        // 🔐 Vérification de la connexion utilisateur
+        //Connexion de l'utilisateur
         if (isset($user['action']) && $user['action'] === "login") {
-            $stmt = $pdo->prepare("SELECT * FROM Users WHERE username = :username");
-            $stmt->execute([':username' => $user['username']]);
-            $foundUser = $stmt->fetch(PDO::FETCH_ASSOC);
+            $foundUser = RecupererDonneesUserParNom($user['username']);
 
-            if ($foundUser) {
-                envoyerDonnees(['success' => true, 'message' => 'Connexion réussie', 'user' => $foundUser], STATUS_HTTP_OK);
+            if ($foundUser && password_verify($user['mdp'], $foundUser['mdp'])) {
+
+                $token = GenererJWT($foundUser['idUser'], $foundUser['username']);
+
+                envoyerDonnees([
+                    'success' => true,
+                    'message' => 'Connexion réussie',
+                    'token' => $token,
+                    'user' => $foundUser
+                ], STATUS_HTTP_OK);
             } else {
-                envoyerDonnees(['error' => 'Utilisateur non trouvé'], STATUS_HTTP_NON_TROUVE);
+                envoyerDonnees(['error' => 'Identifiants invalides'], STATUS_HTTP_NON_AUTORISE);
             }
             exit;
         }
 
-        // 🆕 🔹 NOUVEAU : Vérification et insertion d'un nouvel utilisateur
-        if (!isset($user["username"]) || !isset($user["urlPdP"])) {
+        //Vérification et insertion d'un nouvel utilisateur
+        if (!isset($user["username"])|| !isset($user["mdp"]) || !isset($user["urlPdP"])) {
             envoyerDonnees(['Erreur' => 'Données incomplètes'], STATUS_HTTP_MAUVAISE_REQUETE);
+            exit;
         }
 
         try {
-            $stmt = $pdo->prepare("INSERT INTO Users (username, urlPdP) VALUES (:username, :urlPdP)");
-            $stmt->execute([
-                ':username' => $user['username'],
-                ':urlPdP' => $user['urlPdP'],
-            ]);
-
-            $userId = $pdo->lastInsertId();
-            envoyerDonnees(["success" => true, "message" => "Utilisateur ajouté avec succès", "idUser" => $userId], STATUS_HTTP_OK);
+            $passWordHash = password_hash($user["mdp"], PASSWORD_DEFAULT);
+            $userId = InsererUser($user['username'], $passWordHash, $user['urlPdP']);
+            envoyerDonnees([
+                "success" => true,
+                "message" => "Utilisateur ajouté avec succès",
+                "idUser" => $userId
+            ], STATUS_HTTP_OK);
         } catch (PDOException $e) {
-            envoyerDonnees(["Erreur" => "Problème lors de l'ajout en BDD", "details" => $e->getMessage()], STATUS_HTTP_ERREUR_SERVEUR);
+            envoyerDonnees([
+                "Erreur" => "Problème lors de l'ajout en BDD",
+                "details" => $e->getMessage()
+            ], STATUS_HTTP_ERREUR_DU_SERVEUR);
         }
 
         exit;
@@ -90,7 +99,7 @@ switch ($typeRequete) {
         break;
 
     case 'DELETE':
-        // ✅ Récupération de l'ID utilisateur depuis l'URL
+        // Récupération de l'ID utilisateur depuis l'URL
         $id = filter_input(INPUT_GET, 'idUser', FILTER_VALIDATE_INT);
 
         if (!$id) {
@@ -102,9 +111,9 @@ switch ($typeRequete) {
             envoyerDonnees(['error' => 'Utilisateur non trouvé'], STATUS_HTTP_NON_TROUVE);
         }
 
-        // 🔥 Suppression de l'utilisateur
+        //Suppression de l'utilisateur
         SupprimerUser($id);
-        envoyerDonnees(['message' => "✅ Utilisateur supprimé avec succès"], STATUS_HTTP_OK);
+        envoyerDonnees(['message' => "Utilisateur supprimé avec succès"], STATUS_HTTP_OK);
         break;
 
     default:
