@@ -1,0 +1,132 @@
+/* Styles généraux pour le contenu principal */
+main {
+    background-color: #f4f4f4;
+    min-height: 100vh;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+/* Liste des posts */
+#listPosts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 30px;
+}
+
+/* Carte de post */
+.post-card {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+    margin-bottom: 60px;
+    padding: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    overflow: hidden;
+}
+
+/* Effet au survol de la carte */
+.post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* En-tête du post */
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+/* Photo de profil dans le post */
+.pdp-image {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+    transition: transform 0.3s ease;
+}
+
+/* Effet au survol de l'image de profil */
+.pdp-image:hover {
+    transform: scale(1.1);
+}
+
+/* Nom d'utilisateur */
+.post-header .username {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: #333;
+}
+
+/* Image principale du post */
+.post-image {
+    width: 100%;
+    border-radius: 10px;
+    margin-top: 15px;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+/* Pied de page du post */
+.post-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* Date de création */
+.post-footer .created-at {
+    font-style: italic;
+}
+
+/* Texte en cas d'absence de posts */
+.no-posts {
+    text-align: center;
+    font-size: 1.5rem;
+    color: #888;
+}
+
+/* Style des amis */
+#friendsList img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+}
+
+/* Style de la liste d'amis */
+#friendsList .list-group-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Style des utilisateurs */
+#listUsers img {
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    margin-right: 15px;
+    transition: transform 0.3s ease;
+}
+
+/* Effet au survol des utilisateurs */
+#listUsers img:hover {
+    transform: scale(1.1);
+}
+
+/* Button hover effect */
+button:hover {
+    opacity: 0.8;
+}
